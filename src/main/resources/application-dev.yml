@@ -1,0 +1,5 @@
+rassandra:
+  contactpoints: ${CASSANDRA_CONTACTPOINTS}
+  port: ${CASSANDRA_PORT}
+  keyspace: ${CASSANDRA_KEYSPACE}
+  base-packages: ${CASSANDRA_BASE_PACKAGES}

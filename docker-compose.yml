@@ -1,0 +1,36 @@
+version: '3'
+services:
+  rassandra:
+    environment:
+      - CASSANDRA_CONTACTPOINTS=cassandra-service
+      - CASSANDRA_PORT=9042
+      - CASSANDRA_KEYSPACE=sample
+      - CASSANDRA_BASE_PACKAGES=mx.jovannypcg.rassandra
+    build:
+      context: .
+      dockerfile: src/main/docker/application/Dockerfile
+      args:
+        artifact: rassandra
+        version: 1.0.0
+    command: wait-for-it.sh -t 0 cassandra-service:9042 -- java -Dspring.profiles.active=dev -jar /app/rassandra.jar
+    ports:
+      - '3000:3000'
+    depends_on:
+      - cassandra-service
+  cassandra-service:
+    build:
+      context: .
+      dockerfile: src/main/docker/cassandra/Dockerfile
+    ports:
+      - '7000:7000'
+      - '7001:7001'
+      - '7199:7199'
+      - '9042:9042'
+      - '9160:9160'
+  cassandra-initializer:
+    build:
+      context: .
+      dockerfile: src/main/docker/cassandra/Dockerfile
+    command: wait-for-it.sh cassandra-service:9042 -t 0 -- cassandra-initializer.sh
+    depends_on:
+      - cassandra-service
